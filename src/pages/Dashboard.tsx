@@ -5,6 +5,7 @@ import QuizCard from '@/components/quiz/QuizCard';
 import QuizScreen from '@/components/quiz/QuizScreen';
 import QuizResult from '@/components/quiz/QuizResult';
 import Leaderboard from '@/components/leaderboard/Leaderboard';
+import UniversityLeaderboard from '@/components/leaderboard/UniversityLeaderboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -155,7 +156,10 @@ const Dashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="leaderboard">
-            <Leaderboard />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Leaderboard />
+              <UniversityLeaderboard />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

@@ -5,12 +5,13 @@ interface User {
   name: string;
   email: string;
   score: number;
+  university: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, university: string) => Promise<boolean>;
   logout: () => void;
   updateScore: (points: number) => void;
 }
@@ -45,7 +46,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: foundUser.id,
         name: foundUser.name,
         email: foundUser.email,
-        score: foundUser.score || 0
+        score: foundUser.score || 0,
+        university: foundUser.university
       };
       setUser(userSession);
       localStorage.setItem('academic_user', JSON.stringify(userSession));
@@ -54,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string, university: string): Promise<boolean> => {
     // Simulate API call
     const users = JSON.parse(localStorage.getItem('academic_users') || '[]');
     
@@ -67,7 +69,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name,
       email,
       password,
-      score: 0
+      score: 0,
+      university
     };
 
     users.push(newUser);
@@ -77,7 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
-      score: newUser.score
+      score: newUser.score,
+      university: newUser.university
     };
     setUser(userSession);
     localStorage.setItem('academic_user', JSON.stringify(userSession));

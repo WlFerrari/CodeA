@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, GraduationCap } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { universities } from '@/data/universities';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [university, setUniversity] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -28,6 +31,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
     setEmail('');
     setPassword('');
     setName('');
+    setUniversity('');
     setShowPassword(false);
   };
 
@@ -63,7 +67,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
           return;
         }
         
-        success = await register(name, email, password);
+        if (!university) {
+          toast({
+            title: "Campo obrigatório",
+            description: "Por favor, selecione sua faculdade.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        success = await register(name, email, password, university);
         if (!success) {
           toast({
             title: "Erro no cadastro",
@@ -115,6 +129,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
                   placeholder="Seu nome completo"
                   required
                 />
+              </div>
+            </div>
+          )}
+          
+          {mode === 'register' && (
+            <div className="space-y-2">
+              <Label htmlFor="university" className="text-foreground">Faculdade</Label>
+              <div className="relative">
+                <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
+                <Select value={university} onValueChange={setUniversity} required>
+                  <SelectTrigger className="pl-10">
+                    <SelectValue placeholder="Selecione sua faculdade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {universities.map((uni) => (
+                      <SelectItem key={uni} value={uni}>
+                        {uni}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           )}
