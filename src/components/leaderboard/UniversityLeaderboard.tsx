@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GraduationCap, Trophy, Users } from 'lucide-react';
+import { universities } from '@/data/universities';
 
 interface UniversityRanking {
   university: string;
@@ -12,7 +13,7 @@ interface UniversityRanking {
 }
 
 const UniversityLeaderboard: React.FC = () => {
-  const [universities, setUniversities] = useState<UniversityRanking[]>([]);
+  const [universityRankings, setUniversityRankings] = useState<UniversityRanking[]>([]);
 
   useEffect(() => {
     // Get users from localStorage and group by university
@@ -43,7 +44,7 @@ const UniversityLeaderboard: React.FC = () => {
       .sort((a, b) => b.totalScore - a.totalScore)
       .map((item, index) => ({ ...item, rank: index + 1 }));
     
-    setUniversities(rankingData);
+    setUniversityRankings(rankingData);
   }, []);
 
   const getRankBadge = (rank: number) => {
@@ -59,7 +60,7 @@ const UniversityLeaderboard: React.FC = () => {
     }
   };
 
-  if (universities.length === 0) {
+  if (universityRankings.length === 0) {
     return (
       <Card className="bg-gradient-card border-border">
         <CardHeader>
@@ -89,7 +90,7 @@ const UniversityLeaderboard: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {universities.map((uni) => (
+          {universityRankings.map((uni) => (
             <div
               key={uni.university}
               className={`p-4 rounded-lg border transition-all duration-200 ${

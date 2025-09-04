@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Mail, Lock, User, GraduationCap } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { universities } from '@/data/universities';
+import { universities, University } from '@/data/universities';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -18,9 +18,10 @@ interface AuthModalProps {
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChange }) => {
   const [email, setEmail] = useState('');
+  const [emailPrefix, setEmailPrefix] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [university, setUniversity] = useState('');
+  const [selectedUniversity, setSelectedUniversity] = useState<University | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -29,9 +30,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
 
   const resetForm = () => {
     setEmail('');
+    setEmailPrefix('');
     setPassword('');
     setName('');
-    setUniversity('');
+    setSelectedUniversity(null);
     setShowPassword(false);
   };
 
@@ -46,9 +48,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
 
     try {
       let success = false;
+      let fullEmail = email;
+      
+      
+      if (mode === 'register' && selectedUniversity) {
+        fullEmail = `${emailPrefix}@${selectedUniversity.domain}`;
+      }
       
       if (mode === 'login') {
-        success = await login(email, password);
+        success = await login(fullEmail, password);
         if (!success) {
           toast({
             title: "Erro no login",
@@ -67,7 +75,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
           return;
         }
         
-        if (!university) {
+        if (!selectedUniversity) {
           toast({
             title: "Campo obrigatório",
             description: "Por favor, selecione sua faculdade.",
@@ -77,7 +85,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
           return;
         }
         
-        success = await register(name, email, password, university);
+        if (!emailPrefix.trim()) {
+          toast({
+            title: "Campo obrigatório",
+            description: "Por favor, insira seu email institucional.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        success = await register(name, fullEmail, password, selectedUniversity.name);
         if (!success) {
           toast({
             title: "Erro no cadastro",
@@ -138,14 +156,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
               <Label htmlFor="university" className="text-foreground">Faculdade</Label>
               <div className="relative">
                 <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
-                <Select value={university} onValueChange={setUniversity} required>
+                <Select value={selectedUniversity?.name || ''} onValueChange={(value) => {
+                  const university = universities.find(u => u.name === value);
+                  setSelectedUniversity(university || null);
+                  setEmailPrefix('');
+                }} required>
                   <SelectTrigger className="pl-10">
                     <SelectValue placeholder="Selecione sua faculdade" />
                   </SelectTrigger>
                   <SelectContent>
                     {universities.map((uni) => (
-                      <SelectItem key={uni} value={uni}>
-                        {uni}
+                      <SelectItem key={uni.name} value={uni.name}>
+                        {uni.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -155,18 +177,35 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onModeChan
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="email" className="text-foreground">Email {mode === 'register' ? 'Institucional' : ''}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-10"
-                placeholder="seu@email.com"
-                required
-              />
+              {mode === 'register' && selectedUniversity ? (
+                <div className="flex">
+                  <Input
+                    id="emailPrefix"
+                    type="text"
+                    value={emailPrefix}
+                    onChange={(e) => setEmailPrefix(e.target.value)}
+                    className="pl-10 rounded-r-none border-r-0"
+                    placeholder="seu.nome"
+                    required
+                  />
+                  <div className="px-3 py-2 bg-muted border border-l-0 rounded-r-md text-muted-foreground text-sm flex items-center">
+                    @{selectedUniversity.domain}
+                  </div>
+                </div>
+              ) : (
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                  placeholder="seu@email.com"
+                  required
+                />
+              )}
             </div>
           </div>
           
