@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { GraduationCap, User, LogOut, Trophy } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface NavbarProps {
   onShowAuth: (type: 'login' | 'register') => void;
@@ -20,6 +21,7 @@ const Navbar: React.FC<NavbarProps> = ({ onShowAuth }) => {
           </div>
           
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             {user ? (
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2 text-sm">

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit2, Save, X, Trophy, GraduationCap } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { universities } from '@/data/universities';
 import { useToast } from '@/hooks/use-toast';
 
@@ -69,14 +70,17 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-academic-soft to-background">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/dashboard')}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar ao Dashboard
-          </Button>
+          <div className="flex justify-between items-center">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="mb-4"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar ao Dashboard
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">

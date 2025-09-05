@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, BookOpen, Target, Play, Users, User } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 type ViewState = 'dashboard' | 'quiz' | 'result';
 
@@ -73,6 +74,7 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-between items-center mb-6">
             <div></div>
             <div className="flex gap-2">
+              <ThemeToggle />
               <Button variant="outline" onClick={() => navigate('/profile')}>
                 <User className="w-4 h-4 mr-2" />
                 Perfil
