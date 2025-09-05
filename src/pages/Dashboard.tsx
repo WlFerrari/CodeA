@@ -8,13 +8,15 @@ import Leaderboard from '@/components/leaderboard/Leaderboard';
 import UniversityLeaderboard from '@/components/leaderboard/UniversityLeaderboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, BookOpen, Target, Play, Users } from 'lucide-react';
+import { Trophy, BookOpen, Target, Play, Users, User } from 'lucide-react';
 
 type ViewState = 'dashboard' | 'quiz' | 'result';
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [quizScore, setQuizScore] = useState<number>(0);
@@ -68,6 +70,18 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto p-4 space-y-8">
         {/* Welcome Section */}
         <div className="text-center space-y-4">
+          <div className="flex justify-between items-center mb-6">
+            <div></div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate('/profile')}>
+                <User className="w-4 h-4 mr-2" />
+                Perfil
+              </Button>
+              <Button variant="outline" onClick={logout}>
+                Sair
+              </Button>
+            </div>
+          </div>
           <h1 className="text-4xl font-bold text-foreground">
             Bem-vindo, {user?.name}! 🎓
           </h1>
