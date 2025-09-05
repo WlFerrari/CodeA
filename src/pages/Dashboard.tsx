@@ -71,19 +71,6 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto p-4 space-y-8">
         {/* Welcome Section */}
         <div className="text-center space-y-4">
-          <div className="flex justify-between items-center mb-6">
-            <div></div>
-            <div className="flex gap-2">
-              <ThemeToggle />
-              <Button variant="outline" onClick={() => navigate('/profile')}>
-                <User className="w-4 h-4 mr-2" />
-                Perfil
-              </Button>
-              <Button variant="outline" onClick={logout}>
-                Sair
-              </Button>
-            </div>
-          </div>
           <h1 className="text-4xl font-bold text-foreground">
             Bem-vindo, {user?.name}! 🎓
           </h1>

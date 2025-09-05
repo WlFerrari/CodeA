@@ -67,29 +67,26 @@ const Profile = () => {
   const scoreLevel = getScoreLevel(user.score);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-academic-soft to-background">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <div className="flex justify-between items-center">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/dashboard')}
-              className="mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar ao Dashboard
-            </Button>
-            <ThemeToggle />
-          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/dashboard')}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar ao Dashboard
+          </Button>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Header Card */}
-          <Card className="bg-gradient-to-r from-academic-primary to-academic-secondary text-white border-0">
+          <Card className="bg-gradient-primary border-border shadow-academic">
             <CardContent className="p-8">
               <div className="flex items-center gap-6">
-                <Avatar className="h-24 w-24 border-4 border-white/20">
-                  <AvatarFallback className="bg-white/10 text-white text-2xl font-bold">
+                <Avatar className="h-24 w-24 border-4 border-primary-foreground/20">
+                  <AvatarFallback className="bg-primary-foreground/10 text-primary-foreground text-2xl font-bold">
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>
@@ -101,7 +98,7 @@ const Profile = () => {
                         <Input
                           value={editedName}
                           onChange={(e) => setEditedName(e.target.value)}
-                          className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
+                          className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/70"
                           placeholder="Seu nome"
                         />
                         <Button size="icon" variant="ghost" onClick={handleSave}>
@@ -113,15 +110,15 @@ const Profile = () => {
                       </div>
                     ) : (
                       <>
-                        <h1 className="text-3xl font-bold">{user.name}</h1>
-                        <Button size="icon" variant="ghost" onClick={() => setIsEditing(true)}>
+                        <h1 className="text-3xl font-bold text-primary-foreground">{user.name}</h1>
+                        <Button size="icon" variant="ghost" onClick={() => setIsEditing(true)} className="text-primary-foreground hover:bg-primary-foreground/10">
                           <Edit2 className="w-4 h-4" />
                         </Button>
                       </>
                     )}
                   </div>
                   
-                  <div className="flex items-center gap-4 text-white/90">
+                  <div className="flex items-center gap-4 text-primary-foreground/90">
                     <div className="flex items-center gap-2">
                       <GraduationCap className="w-5 h-5" />
                       <span>{university?.name}</span>
@@ -132,7 +129,7 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  <Badge className={`mt-3 ${scoreLevel.color} text-white border-0`}>
+                  <Badge className="mt-3 bg-primary-foreground/20 text-primary-foreground border-0">
                     {scoreLevel.level}
                   </Badge>
                 </div>
@@ -145,7 +142,7 @@ const Profile = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5 text-academic-primary" />
+                  <GraduationCap className="w-5 h-5 text-primary" />
                   Informações Acadêmicas
                 </CardTitle>
               </CardHeader>
@@ -175,19 +172,19 @@ const Profile = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-academic-accent" />
+                  <Trophy className="w-5 h-5 text-academic-gold" />
                   Estatísticas de Desempenho
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-academic-soft rounded-lg">
-                    <div className="text-2xl font-bold text-academic-primary">{user.score}</div>
+                  <div className="text-center p-4 bg-muted/30 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">{user.score}</div>
                     <div className="text-sm text-muted-foreground">Pontos Totais</div>
                   </div>
                   
-                  <div className="text-center p-4 bg-academic-soft rounded-lg">
-                    <div className="text-2xl font-bold text-academic-secondary">{scoreLevel.level}</div>
+                  <div className="text-center p-4 bg-muted/30 rounded-lg">
+                    <div className="text-2xl font-bold text-secondary-foreground">{scoreLevel.level}</div>
                     <div className="text-sm text-muted-foreground">Nível Atual</div>
                   </div>
                 </div>
@@ -205,7 +202,7 @@ const Profile = () => {
                         </div>
                         <div className="w-full bg-muted rounded-full h-2">
                           <div 
-                            className="bg-gradient-to-r from-academic-accent to-academic-secondary h-2 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-academic-gold to-secondary h-2 rounded-full transition-all duration-300"
                             style={{ width: `${(user.score / 200) * 100}%` }}
                           />
                         </div>
@@ -218,7 +215,7 @@ const Profile = () => {
                         </div>
                         <div className="w-full bg-muted rounded-full h-2">
                           <div 
-                            className="bg-gradient-to-r from-academic-secondary to-academic-primary h-2 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-secondary to-primary h-2 rounded-full transition-all duration-300"
                             style={{ width: `${(user.score / 500) * 100}%` }}
                           />
                         </div>
@@ -231,14 +228,14 @@ const Profile = () => {
                         </div>
                         <div className="w-full bg-muted rounded-full h-2">
                           <div 
-                            className="bg-gradient-to-r from-academic-primary to-academic-accent h-2 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-primary to-academic-gold h-2 rounded-full transition-all duration-300"
                             style={{ width: `${(user.score / 1000) * 100}%` }}
                           />
                         </div>
                       </div>
                     ) : (
                       <div className="text-center py-4">
-                        <Badge className="bg-gradient-to-r from-academic-primary to-academic-accent text-white">
+                        <Badge className="bg-gradient-primary text-primary-foreground">
                           Nível Máximo Alcançado! 🎉
                         </Badge>
                       </div>
