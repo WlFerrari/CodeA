@@ -1,8 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { GraduationCap, User, LogOut, Trophy } from 'lucide-react';
+import { User, LogOut, Trophy, Shield } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Link } from 'react-router-dom';
+import logo from '@/assets/logo.png';
 
 interface NavbarProps {
   onShowAuth: (type: 'login' | 'register') => void;
@@ -15,23 +17,42 @@ const Navbar: React.FC<NavbarProps> = ({ onShowAuth }) => {
     <nav className="bg-card border-b border-border shadow-card-academic">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-2">
-            <GraduationCap className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">Project Code Academic</span>
+          <div className="flex items-center space-x-3">
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-12 w-12 md:h-16 md:w-16 object-contain"
+              loading="lazy"
+            />
+            <span className="text-xl md:text-2xl font-bold text-foreground">Project Code Academic</span>
           </div>
           
           <div className="flex items-center space-x-4">
             <ThemeToggle />
             {user ? (
               <div className="flex items-center space-x-4">
+                {user.role === 'admin' && (
+                  <Link to="/admin" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+                    <Shield className="h-4 w-4" /> Admin
+                  </Link>
+                )}
                 <div className="flex items-center space-x-2 text-sm">
                   <Trophy className="h-4 w-4 text-academic-gold" />
                   <span className="font-medium text-foreground">{user.score} pontos</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <Link to="/profile" className="flex items-center space-x-2 hover:opacity-80">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-foreground">{user.name}</span>
-                </div>
+                </Link>
+                <Link to="/profile">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                  >
+                    Meu Perfil
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   size="sm"

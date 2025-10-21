@@ -48,7 +48,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ quiz, onFinish, onBack }) => {
 
   const handleNextQuestion = () => {
     if (isLastQuestion) {
-      const finalScore = selectedAnswer === currentQuestion.correctAnswer ? score + 1 : score;
+      const finalScore = score;
       const pointsEarned = Math.round((finalScore / quiz.questions.length) * quiz.totalPoints);
       updateScore(pointsEarned);
       onFinish(finalScore, quiz.questions.length);

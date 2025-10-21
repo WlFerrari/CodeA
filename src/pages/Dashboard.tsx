@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { quizzes, Quiz } from '@/data/quizData';
+import { Quiz } from '@/data/quizData';
+import { getQuizzes } from '@/lib/quizStore';
 import QuizCard from '@/components/quiz/QuizCard';
 import QuizScreen from '@/components/quiz/QuizScreen';
 import QuizResult from '@/components/quiz/QuizResult';
@@ -42,6 +43,8 @@ const Dashboard: React.FC = () => {
     setCurrentView('dashboard');
     setSelectedQuiz(null);
   };
+
+  const quizzes = useMemo(() => getQuizzes(), [currentView]);
 
   if (currentView === 'quiz' && selectedQuiz) {
     return (

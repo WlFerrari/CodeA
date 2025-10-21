@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GraduationCap, Trophy, Users } from 'lucide-react';
-import { universities } from '@/data/universities';
 
 interface UniversityRanking {
   university: string;
@@ -33,13 +32,13 @@ const UniversityLeaderboard: React.FC = () => {
     });
 
     // Convert to array and calculate rankings
-    const rankingData = Object.entries(universityData)
+    const rankingData: UniversityRanking[] = Object.entries(universityData)
       .map(([university, data]) => ({
         university,
         totalScore: data.totalScore,
         userCount: data.users.length,
         averageScore: Math.round(data.totalScore / data.users.length),
-        rank: 0
+        rank: 0,
       }))
       .sort((a, b) => b.totalScore - a.totalScore)
       .map((item, index) => ({ ...item, rank: index + 1 }));

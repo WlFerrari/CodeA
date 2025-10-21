@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Medal, Award, Crown } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface LeaderboardUser {
   id: string;
   name: string;
   score: number;
   rank: number;
+  avatarUrl?: string;
 }
 
 const Leaderboard: React.FC = () => {
@@ -16,7 +18,7 @@ const Leaderboard: React.FC = () => {
   useEffect(() => {
     // Get users from localStorage and sort by score
     const storedUsers = JSON.parse(localStorage.getItem('academic_users') || '[]');
-    const sortedUsers = storedUsers
+    const sortedUsers: LeaderboardUser[] = storedUsers
       .filter((user: any) => user.score > 0)
       .sort((a: any, b: any) => b.score - a.score)
       .slice(0, 10)
@@ -24,7 +26,8 @@ const Leaderboard: React.FC = () => {
         id: user.id,
         name: user.name,
         score: user.score,
-        rank: index + 1
+        rank: index + 1,
+        avatarUrl: user.avatarUrl,
       }));
     
     setUsers(sortedUsers);
@@ -55,6 +58,26 @@ const Leaderboard: React.FC = () => {
         return <Badge variant="outline">{rank}º</Badge>;
     }
   };
+
+  const getInitials = (name: string) => name.split(' ').map((n) => n[0]).join('').slice(0,2).toUpperCase();
+
+  const getAvatarSizeClass = (rank: number) => {
+    if (rank === 1) return 'h-16 w-16';
+    if (rank === 2 || rank === 3) return 'h-12 w-12';
+    return 'h-10 w-10';
+  };
+
+  const getAvatarRingClass = (rank: number) => {
+    if (rank === 1) return 'ring-2 ring-[#D4AF37]'; // ouro
+    if (rank === 2) return 'ring-2 ring-[#C0C0C0]'; // prata
+    if (rank === 3) return 'ring-2 ring-[#CD7F32]'; // bronze
+    return '';
+  };
+
+  const getContainerClasses = (rank: number) =>
+    rank <= 3
+      ? 'border-academic-gold/30 bg-academic-gold/5 shadow-md'
+      : 'border-border bg-muted/30 hover:bg-muted/50';
 
   if (users.length === 0) {
     return (
@@ -89,15 +112,25 @@ const Leaderboard: React.FC = () => {
           {users.map((user) => (
             <div
               key={user.id}
-              className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-200 ${
-                user.rank <= 3
-                  ? 'border-academic-gold/30 bg-academic-gold/5 shadow-md'
-                  : 'border-border bg-muted/30 hover:bg-muted/50'
-              }`}
+              className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-200 ${getContainerClasses(user.rank)}`}
             >
               <div className="flex items-center space-x-4">
-                <div className="flex items-center justify-center w-12 h-12">
+                <div className="flex items-center justify-center w-10 h-10">
                   {getRankIcon(user.rank)}
+                </div>
+                <div className={`relative ${getAvatarSizeClass(user.rank)}`}>
+                  <Avatar className={`h-full w-full ${getAvatarRingClass(user.rank)}`}>
+                    {user.avatarUrl ? (
+                      <AvatarImage src={user.avatarUrl} alt={user.name} className="object-cover" />
+                    ) : (
+                      <AvatarFallback className="text-xs font-semibold">
+                        {getInitials(user.name)}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  {user.rank === 1 && (
+                    <Crown className="absolute -top-2 -right-2 h-5 w-5 text-academic-gold drop-shadow" />
+                  )}
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">{user.name}</h3>

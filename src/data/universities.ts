@@ -7,7 +7,7 @@ export const universities: University[] = [
   { name: 'Universidade Estadual de Londrina (UEL)', domain: 'uel.br' },
   { name: 'Universidade Norte do Paraná (UNOPAR)', domain: 'unopar.br' },
   { name: 'Pontifícia Universidade Católica do Paraná (PUCPR) - Campus Londrina', domain: 'pucpr.br' },
-  { name: 'Centro Universitário Filadélfia (UniFil)', domain: 'unifil.br' },
+  { name: 'Centro Universitário Filadélfia (UniFil)', domain: 'edu.unifil.br' },
   { name: 'Universidade Pitágoras UNOPAR', domain: 'pitagoras.com.br' },
   { name: 'Faculdade Metropolitana de Maringá (FAMMA) - Unidade Londrina', domain: 'famma.br' },
   { name: 'Centro Universitário das Faculdades Associadas de Ensino (FAE)', domain: 'fae.edu' },
