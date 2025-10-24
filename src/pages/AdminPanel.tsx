@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import AdminRoute from '@/components/admin/AdminRoute';
-import { useAuth } from '@/contexts/AuthContext';
 import { getQuizzes, addQuiz, updateQuiz, deleteQuiz } from '@/lib/quizStore';
 import { Quiz, Question } from '@/data/quizData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +14,15 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Pencil, Save, Users as UsersIcon, BookOpen, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  university: string;
+  score: number;
+  role?: 'admin' | 'user';
+}
+
 const emptyQuestion = (): Question => ({
   id: `q-${Date.now()}`,
   question: '',
@@ -25,14 +33,13 @@ const emptyQuestion = (): Question => ({
 });
 
 const AdminPanel: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
   // Users list
   const [activeTab, setActiveTab] = useState<'quizzes' | 'users'>('quizzes');
   const [prevTab, setPrevTab] = useState<'quizzes' | 'users' | null>(null);
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   // Dialog state
   const [isQuizDialogOpen, setIsQuizDialogOpen] = useState(false);
@@ -46,8 +53,10 @@ const AdminPanel: React.FC = () => {
 
   const reload = () => {
     setQuizzes(getQuizzes());
-    const storedUsers = JSON.parse(localStorage.getItem('academic_users') || '[]');
-    setUsers(storedUsers);
+    const storedUsers = JSON.parse(localStorage.getItem('academic_users') || '[]') as User[];
+    // Deduplicate users to prevent "duplicate key" warnings
+    const uniqueUsers = Array.from(new Map(storedUsers.map(user => [user.id, user])).values());
+    setUsers(uniqueUsers);
   };
 
   useEffect(() => {
@@ -104,7 +113,7 @@ const AdminPanel: React.FC = () => {
   const addNewQuestion = () => setQuestions((prev) => [...prev, emptyQuestion()]);
   const removeQuestion = (qid: string) => setQuestions((prev) => prev.filter((q) => q.id !== qid));
 
-  const updateQuestionField = (qid: string, field: keyof Question, value: any) => {
+  const updateQuestionField = (qid: string, field: keyof Question, value: string | number) => {
     setQuestions((prev) => prev.map((q) => (q.id === qid ? { ...q, [field]: value } : q)));
   };
 
@@ -115,8 +124,8 @@ const AdminPanel: React.FC = () => {
   };
 
   const promoteToAdmin = (uid: string) => {
-    const all = JSON.parse(localStorage.getItem('academic_users') || '[]');
-    const idx = all.findIndex((u: any) => u.id === uid);
+    const all: User[] = JSON.parse(localStorage.getItem('academic_users') || '[]');
+    const idx = all.findIndex((u) => u.id === uid);
     if (idx !== -1) {
       all[idx] = { ...all[idx], role: 'admin' };
       localStorage.setItem('academic_users', JSON.stringify(all));
@@ -125,11 +134,20 @@ const AdminPanel: React.FC = () => {
   };
 
   const demoteToUser = (uid: string) => {
-    const all = JSON.parse(localStorage.getItem('academic_users') || '[]');
-    const idx = all.findIndex((u: any) => u.id === uid);
+    const all: User[] = JSON.parse(localStorage.getItem('academic_users') || '[]');
+    const idx = all.findIndex((u) => u.id === uid);
     if (idx !== -1) {
       all[idx] = { ...all[idx], role: 'user' };
       localStorage.setItem('academic_users', JSON.stringify(all));
+      reload();
+    }
+  };
+
+  const deleteUser = (uid: string) => {
+    if (confirm('Tem certeza que deseja excluir este usuário? Esta ação é irreversível.')) {
+      const all: User[] = JSON.parse(localStorage.getItem('academic_users') || '[]');
+      const updatedUsers = all.filter((u) => u.id !== uid);
+      localStorage.setItem('academic_users', JSON.stringify(updatedUsers));
       reload();
     }
   };
@@ -142,7 +160,14 @@ const AdminPanel: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => (prevTab ? (setActiveTab(prevTab), setPrevTab(null)) : navigate(-1))}
+              onClick={() => {
+                if (prevTab) {
+                  setActiveTab(prevTab);
+                  setPrevTab(null);
+                } else {
+                  navigate(-1);
+                }
+              }}
               className="shrink-0"
             >
               <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
@@ -152,9 +177,9 @@ const AdminPanel: React.FC = () => {
 
           <Tabs
             value={activeTab}
-            onValueChange={(v: any) => {
+            onValueChange={(v) => {
               setPrevTab(activeTab);
-              setActiveTab(v);
+              setActiveTab(v as 'quizzes' | 'users');
             }}
             className="space-y-6"
           >
@@ -218,6 +243,9 @@ const AdminPanel: React.FC = () => {
                           ) : (
                             <Button size="sm" variant="outline" onClick={() => demoteToUser(u.id)}>Rebaixar para User</Button>
                           )}
+                          <Button size="sm" variant="destructive" onClick={() => deleteUser(u.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -243,7 +271,7 @@ const AdminPanel: React.FC = () => {
               </div>
               <div>
                 <Label>Dificuldade</Label>
-                <Select value={difficulty} onValueChange={(v: any) => setDifficulty(v)}>
+                <Select value={difficulty} onValueChange={(v) => setDifficulty(v as 'easy' | 'medium' | 'hard')}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -299,7 +327,7 @@ const AdminPanel: React.FC = () => {
                       </div>
                       <div>
                         <Label className="text-xs">Dificuldade</Label>
-                        <Select value={q.difficulty} onValueChange={(v: any) => updateQuestionField(q.id, 'difficulty', v)}>
+                        <Select value={q.difficulty} onValueChange={(v) => updateQuestionField(q.id, 'difficulty', v as 'easy' | 'medium' | 'hard')}>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione" />
                           </SelectTrigger>
