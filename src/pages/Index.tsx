@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/ui/navbar';
-import AuthModal from '@/components/auth/AuthModal';
+import AuthModal from '@/components/auth/VerifiedAuthModal';
 import Dashboard from './Dashboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
