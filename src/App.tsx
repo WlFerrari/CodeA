@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
+import BulkSync from "@/components/BulkSync";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,8 @@ const App = () => (
     >
       <AuthProvider>
         <TooltipProvider>
+          {/* Sync local users to backend DB on app start */}
+          <BulkSync />
           <Toaster />
           <Sonner />
           <BrowserRouter>

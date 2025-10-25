@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/ui/navbar';
 import AuthModal from '@/components/auth/VerifiedAuthModal';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { GraduationCap, Brain, Trophy, Users, Play, BookOpen } from 'lucide-react';
 import heroImage from '@/assets/hero-academic.jpg';
+import { api } from '@/lib/api';
 
 const Index = () => {
   const { user } = useAuth();
@@ -14,6 +15,22 @@ const Index = () => {
     isOpen: false,
     mode: 'login'
   });
+
+  useEffect(() => {
+    // Always try to persist the current user to backend on login/register
+    if (user?.email && user?.name) {
+      api.upsertUser({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        university: user.university ?? null,
+        avatarUrl: user.avatarUrl ?? null,
+        bannerUrl: user.bannerUrl ?? null,
+        role: user.role ?? 'user',
+        score: user.score ?? 0,
+      }).catch(() => {});
+    }
+  }, [user?.id, user?.email, user?.name]);
 
   const handleShowAuth = (mode: 'login' | 'register') => {
     setAuthModal({ isOpen: true, mode });

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Medal, Award, Crown } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { api } from '@/lib/api';
 
 interface LeaderboardUser {
   id: string;
@@ -16,21 +17,31 @@ const Leaderboard: React.FC = () => {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
 
   useEffect(() => {
-    // Get users from localStorage and sort by score
-    const storedUsers = JSON.parse(localStorage.getItem('academic_users') || '[]');
-    const sortedUsers: LeaderboardUser[] = storedUsers
-      .filter((user: any) => user.score > 0)
-      .sort((a: any, b: any) => b.score - a.score)
-      .slice(0, 10)
-      .map((user: any, index: number) => ({
-        id: user.id,
-        name: user.name,
-        score: user.score,
-        rank: index + 1,
-        avatarUrl: user.avatarUrl,
-      }));
-    
-    setUsers(sortedUsers);
+    let cancelled = false;
+    api.getLeaderboard(10)
+      .then((res) => {
+        if (!cancelled) {
+          const withRank = res.users.map((u, i) => ({ id: u.id, name: u.name, score: u.score, avatarUrl: u.avatarUrl, rank: u.rank ?? i + 1 }));
+          setUsers(withRank);
+        }
+      })
+      .catch(() => {
+        // Fallback: localStorage
+        const storedUsers = JSON.parse(localStorage.getItem('academic_users') || '[]');
+        const sortedUsers: LeaderboardUser[] = storedUsers
+          .filter((user: any) => user.score > 0)
+          .sort((a: any, b: any) => b.score - a.score)
+          .slice(0, 10)
+          .map((user: any, index: number) => ({
+            id: user.id,
+            name: user.name,
+            score: user.score,
+            rank: index + 1,
+            avatarUrl: user.avatarUrl,
+          }));
+        if (!cancelled) setUsers(sortedUsers);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   const getRankIcon = (rank: number) => {

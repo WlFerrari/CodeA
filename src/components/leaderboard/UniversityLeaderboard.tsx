@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GraduationCap, Trophy, Users } from 'lucide-react';
+import { api } from '@/lib/api';
 
 interface UniversityRanking {
   university: string;
@@ -15,35 +16,37 @@ const UniversityLeaderboard: React.FC = () => {
   const [universityRankings, setUniversityRankings] = useState<UniversityRanking[]>([]);
 
   useEffect(() => {
-    // Get users from localStorage and group by university
-    const storedUsers = JSON.parse(localStorage.getItem('academic_users') || '[]');
-    
-    // Group users by university
-    const universityData: { [key: string]: { totalScore: number; users: any[] } } = {};
-    
-    storedUsers.forEach((user: any) => {
-      if (user.university && user.score > 0) {
-        if (!universityData[user.university]) {
-          universityData[user.university] = { totalScore: 0, users: [] };
-        }
-        universityData[user.university].totalScore += user.score;
-        universityData[user.university].users.push(user);
-      }
-    });
-
-    // Convert to array and calculate rankings
-    const rankingData: UniversityRanking[] = Object.entries(universityData)
-      .map(([university, data]) => ({
-        university,
-        totalScore: data.totalScore,
-        userCount: data.users.length,
-        averageScore: Math.round(data.totalScore / data.users.length),
-        rank: 0,
-      }))
-      .sort((a, b) => b.totalScore - a.totalScore)
-      .map((item, index) => ({ ...item, rank: index + 1 }));
-    
-    setUniversityRankings(rankingData);
+    let cancelled = false;
+    api.getUniversityLeaderboard()
+      .then((res) => {
+        if (!cancelled) setUniversityRankings(res.universities as any);
+      })
+      .catch(() => {
+        // Fallback local aggregation
+        const storedUsers = JSON.parse(localStorage.getItem('academic_users') || '[]');
+        const universityData: { [key: string]: { totalScore: number; users: any[] } } = {};
+        storedUsers.forEach((user: any) => {
+          if (user.university && user.score > 0) {
+            if (!universityData[user.university]) {
+              universityData[user.university] = { totalScore: 0, users: [] };
+            }
+            universityData[user.university].totalScore += user.score;
+            universityData[user.university].users.push(user);
+          }
+        });
+        const rankingData: UniversityRanking[] = Object.entries(universityData)
+          .map(([university, data]) => ({
+            university,
+            totalScore: data.totalScore,
+            userCount: data.users.length,
+            averageScore: Math.round(data.totalScore / data.users.length),
+            rank: 0,
+          }))
+          .sort((a, b) => b.totalScore - a.totalScore)
+          .map((item, index) => ({ ...item, rank: index + 1 }));
+        if (!cancelled) setUniversityRankings(rankingData);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   const getRankBadge = (rank: number) => {

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Quiz, Question } from '@/data/quizData';
+import { Quiz } from '@/data/quizData';
 import { useAuth } from '@/contexts/AuthContext';
 import { CheckCircle, XCircle, Clock, Trophy, BookOpen } from 'lucide-react';
+import { api } from '@/lib/api';
 
 interface QuizScreenProps {
   quiz: Quiz;
@@ -21,8 +22,8 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ quiz, onFinish, onBack }) => {
     new Array(quiz.questions.length).fill(false)
   );
   
-  const { updateScore } = useAuth();
-  
+  const { updateScore, user } = useAuth();
+
   const currentQuestion = quiz.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
@@ -51,6 +52,10 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ quiz, onFinish, onBack }) => {
       const finalScore = score;
       const pointsEarned = Math.round((finalScore / quiz.questions.length) * quiz.totalPoints);
       updateScore(pointsEarned);
+      // Best-effort: persist no backend por email (ID pode ser diferente local vs servidor)
+      if (user?.email && pointsEarned > 0) {
+        api.incrementScoreByEmail(user.email, pointsEarned).catch(() => {});
+      }
       onFinish(finalScore, quiz.questions.length);
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
